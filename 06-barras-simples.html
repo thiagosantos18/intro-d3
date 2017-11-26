@@ -11,7 +11,9 @@
       <div class="row">
         <h2>Um SVG dinâmico</h2>
       </div>
-      <div class="row mychart" id="chart">
+      <div class="row mychart" id="v1">
+      </div>
+	  <div class="row mychart" id="v2">
       </div>
     </div>
 
@@ -33,11 +35,18 @@
       var largura = 200,
           altura = 500;
 
-      var svg = d3.select('#chart')
+      var svg1 = d3.select('#v1')
                 .append('svg')
                 .attr('width', largura)
                 .attr('height', altura);
-
+	  
+	  /*Grafico vertical			
+	  var svg2 = d3.select('#v2')
+                .append('svg')
+                .attr('width', altura)
+                .attr('height', largura);
+	   */
+	   
       /* Edite o código abaixo para criar um gráfico de barras horizontais
        *
        * Crie funções que a partir dos dados definem os atributos x, y, width
@@ -49,15 +58,26 @@
        * (Nem pense em fazer hardcoded :)).
        */
 
-      svg.selectAll('rect')
+      svg1.selectAll('rect')
           .data(dados)
           .enter()
             .append('rect')
-              .attr('x', 0) // A função com dois parâmetros pode entrar aqui
-              .attr('y', 0) // e aqui
-              .attr('width', 30)
-              .attr('height', 20);
-
+              .attr('x', 0)
+              .attr('y', function(d, i){return i*altura/dados.length})
+              .attr('width', function(d, i){return 2*d})
+              .attr('height', (altura/dados.length)-4);
+			  
+	/*Grafico vertical 
+	  svg2.selectAll('rect')
+          .data(dados)
+          .enter()
+            .append('rect')
+              .attr('x', function(d, i){return i*largura/dados.length})
+              .attr('y', 0)
+              .attr('width', (largura/dados.length)-4)
+              .attr('height', function(d, i){return d});
+	*/
+	
       /* Mais dicas :
        * - As barras ficam mais legíveis se não encostarem umas nas outras. Para isso
        * a maneira mais fácil é diminuir um pouco a largura delas (como elas estao deitadas,
