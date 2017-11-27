@@ -40,12 +40,12 @@
                 .attr('width', largura)
                 .attr('height', altura);
 	  
-	  /*Grafico vertical			
+	  		
 	  var svg2 = d3.select('#v2')
                 .append('svg')
                 .attr('width', altura)
                 .attr('height', largura);
-	   */
+	   
 	   
       /* Edite o código abaixo para criar um gráfico de barras horizontais
        *
@@ -67,16 +67,16 @@
               .attr('width', function(d, i){return 2*d})
               .attr('height', (altura/dados.length)-4);
 			  
-	/*Grafico vertical 
+	
 	  svg2.selectAll('rect')
           .data(dados)
           .enter()
             .append('rect')
-              .attr('x', function(d, i){return i*largura/dados.length})
-              .attr('y', 0)
-              .attr('width', (largura/dados.length)-4)
-              .attr('height', function(d, i){return d});
-	*/
+              .attr('x', function(d, i){return i*altura/dados.length})
+              .attr('y', function(d, i){return largura-(2*d)})
+              .attr('width', (altura/dados.length)-4)
+              .attr('height', function(d, i){return 2*d});
+	
 	
       /* Mais dicas :
        * - As barras ficam mais legíveis se não encostarem umas nas outras. Para isso
