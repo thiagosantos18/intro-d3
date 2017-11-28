@@ -21,11 +21,9 @@
     .mychart rect {
       fill: steelblue;
     }
-
     .mychart rect:hover {
       fill: goldenrod;
     }
-
     .mychart text {
       font: 12px sans-serif;
       text-anchor: left;
@@ -83,11 +81,8 @@
     }
 
     d3.tsv('dados/alphabet.tsv', function(dados) {
-      console.log("provavelmente acontece depois")
       desenhaBarras(dados);
     });
-
-    console.log("provavelmente acontece primeiro") // me apague quando entender.
 
     /*
     * Assim como a função d3.tsv, existe a d3.csv e a d3.json
