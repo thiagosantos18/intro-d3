@@ -77,10 +77,14 @@
       /*
        * As escalas
        */
-      var x = d3.scaleBand(); // Configure essa escala com domain, range e padding
-
-      var y = d3.scaleLinear() // Configure essa escala com domain e range
-                               // Lembre que uma escala pode converter de 1..10 -> 100..1
+      var x = d3.scaleBand()
+                .domain(dados.map((d, i) => d.letra))
+                .range([0, larguraVis])
+                .paddingInner(0.2); // Configure essa escala com domain, range e padding OK
+				
+      var y = d3.scaleLinear()
+                .domain([0, d3.max(dados.map((d, i) => d.valor))]) // Configure essa escala com domain e range OK
+                .range([alturaVis, 0]);               // Lembre que uma escala pode converter de 1..10 -> 100..1 OK
 
       // === ATÉ DAQUI ===
 
