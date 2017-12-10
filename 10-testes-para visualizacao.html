@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <title>Dados em parágrafos</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="row">
+        <h3>Dados no DOM</h3>
+      </div>
+      <div class="row" id="pros_dados">
+      </div>
+    </div>
+
+<!-- PARTE 1: select + append  -->
+    <script type="text/javascript">
+      d3.select('.row') // .xpto == elemento da classe xpto
+      .append('p')
+      .text('Sou um parágrafo recém-criado!');
+    </script>
+
+    <script type =  "text/javascript">
+    d3.select('p').append('p').text('consegui');
+    </script>
+
+
+<!-- PARTE 2: dados -->
+     <script type="text/javascript">
+      function desenhaPontos(dados) {
+      d3.select("#pros_dados") // #xpto == elemento com id xpto
+        .selectAll("p")
+      .data(dados)
+      .enter()
+        .append("p")
+        .text(function(d) {return "Horario: " + d.horario_inicial + " Local: " + d.local + " Total: " + (parseInt(d.total_motorizados) + parseInt(d.total_ciclistas) + parseInt(d.total_pedestres));}).style('font-size', "25px")
+      }
+
+      d3.csv('dados/dados.csv', function(dados) {
+        desenhaPontos(dados);
+      });
+    </script>
+  </body>
+</html>
