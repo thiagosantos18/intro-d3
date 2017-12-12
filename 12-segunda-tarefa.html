@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8">
+  <title>Barras simples</title>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <h2>Tarefa 01</h2>
+    </div>
+    <div class="row mychart" id="bobs">
+    <h3>Bob's</h3>
+    </div>
+    <div class="row mychart" id="jackson">
+    <h3>Jackson do Bandeiro</h3>
+    </div>
+    <div class="row mychart" id="burrinhos">
+    <h3>Burrinhos do açude</h3>
+    </div>
+    <h5>Não sei porque o dominio do x não está indo até o máximo dos burrinhos</h5>
+  </div>
+
+  <style>
+    .mychart rect {
+      fill: steelblue;
+    }
+    .mychart rect:hover {
+      fill: goldenrod;
+    }
+    .mychart text {
+      font: 10px sans-serif;
+      text-anchor: left;
+    }
+
+  </style>
+
+  <script type="text/javascript">
+    "use strict"
+
+    function desenhaBarras(dados) {
+
+      var dados_bobs = dados.filter((d) =>  d.local === "bobs");
+      var dados_jackson = dados.filter((d) =>  d.local === "jackson");
+      var dados_burrinhos = dados.filter((d) =>  d.local === "burrinhos");
+
+      // definicoes de altura e largura do svg e da vis dentro
+      var alturaSVG = 900, larguraSVG = 500;
+      var	margin = {top: 10, right: 20, bottom:30, left: 45}, // para descolar a vis das bordas do grafico
+          larguraVis = larguraSVG - margin.left - margin.right,
+          alturaVis = alturaSVG - margin.top - margin.bottom;
+
+      var y = d3.scaleBand()
+                .domain(dados_bobs.map((d, i) => d.horario_inicial))
+                .range([0, alturaVis])
+                .paddingInner(0.25); // Configure essa escala com domain, range e padding OK
+
+      var max = d3.max(dados_burrinhos, (d, i) => d.total_motorizados);
+
+      var x = d3.scaleLinear()
+                .domain([0, max]) // Configure essa escala com domain e range OK
+                .range([0, larguraVis]);        // Lembre que uma escala pode converter de 1..10 -> 100..1 OK
+
+
+      var grafico_bobs = d3.select('#bobs') // cria elemento <svg> com um <g> dentro
+         .append('svg')
+         .attr('width', larguraVis + margin.left + margin.right)
+         .attr('height', alturaVis + margin.top + margin.bottom)
+         .append('g') // para entender o <g> vá em x03-detalhes-svg.html
+         .attr('transform', 'translate(' +  margin.left + ',' + margin.top + ')');
+
+
+      var grafico_jackson = d3.select('#jackson') // cria elemento <svg> com um <g> dentro
+          .append('svg')
+          .attr('width', larguraVis + margin.left + margin.right)
+          .attr('height', alturaVis + margin.top + margin.bottom)
+          .append('g') // para entender o <g> vá em x03-detalhes-svg.html
+          .attr('transform', 'translate(' +  margin.left + ',' + margin.top + ')');
+
+
+      var grafico_burrinhos = d3.select('#burrinhos') // cria elemento <svg> com um <g> dentro
+            .append('svg')
+            .attr('width', larguraVis + margin.left + margin.right)
+            .attr('height', alturaVis + margin.top + margin.bottom)
+            .append('g') // para entender o <g> vá em x03-detalhes-svg.html
+            .attr('transform', 'translate(' +  margin.left + ',' + margin.top + ')');
+
+        grafico_bobs.selectAll('rect')
+            .data(dados_bobs)
+            .enter()
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', function(d, i){return i*alturaVis/dados_bobs.length})
+            .attr('height', y.bandwidth())
+            .attr('width', (d) => x(d.total_motorizados));
+
+        grafico_bobs.selectAll('g')
+          .data(dados_bobs)
+          .enter()
+          .append('text')
+          .attr('x', d => x(d.total_motorizados)).attr('y', d => y(d.horario_inicial)).attr('transform', 'translate(2,8)').text(d => d.total_motorizados);
+
+       grafico_bobs.append('g')
+                .attr('transform', 'translate(0,0)')
+                .call(d3.axisLeft(y))  // gera eixo a partir da escala
+
+       grafico_bobs.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + alturaVis + ")")
+              .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
+
+
+       grafico_jackson.selectAll('rect')
+              .data(dados_jackson)
+              .enter()
+              .append('rect')
+              .attr('x', 0)
+              .attr('y', function(d, i){return i*alturaVis/dados_jackson.length})
+              .attr('height', y.bandwidth())
+              .attr('width', (d) => x(d.total_motorizados));
+
+      grafico_jackson.selectAll('g')
+                .data(dados_jackson)
+                .enter()
+                .append('text')
+                .attr('x', d => x(d.total_motorizados)).attr('y', d => y(d.horario_inicial)).attr('transform', 'translate(2,8)').text(d => d.total_motorizados);
+
+      grafico_jackson.append('g')
+                .attr('transform', 'translate(0,0)')
+                .call(d3.axisLeft(y))  // gera eixo a partir da escala
+
+      grafico_jackson.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + alturaVis + ")")
+                .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
+
+
+      grafico_burrinhos.selectAll('rect')
+                .data(dados_burrinhos)
+                .enter()
+                .append('rect')
+                .attr('x', 0)
+                .attr('y', function(d, i){return i*alturaVis/dados_burrinhos.length})
+                .attr('height', y.bandwidth())
+                .attr('width', (d) => x(d.total_motorizados));
+
+      grafico_burrinhos.selectAll('g')
+          .data(dados_burrinhos)
+          .enter()
+          .append('text')
+          .attr('x', d => x(d.total_motorizados)).attr('y', d => y(d.horario_inicial)).attr('transform', 'translate(2,8)').text(d => d.total_motorizados);
+
+     grafico_burrinhos.append('g')
+         .attr('transform', 'translate(0,0)')
+         .call(d3.axisLeft(y))  // gera eixo a partir da escala
+
+     grafico_burrinhos.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + alturaVis + ")")
+        .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
+
+    }
+
+    d3.csv('dados/dados.csv', function(dados) {
+      desenhaBarras(dados);
+    });
+
+  </script>
+</body>
+
+</html>
