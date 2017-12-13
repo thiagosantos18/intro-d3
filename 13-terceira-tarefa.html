@@ -20,10 +20,7 @@
     <h3 style="text-align:center;">Burrinhos do açude</h3>
     </div>
   </div>
-  <div class="row" id='legenda'>
-    <h5>Legenda</h5>
-  </div>
-
+  <h5 style="text-align:center;">Legenda <div class="row" id='legenda'></div></h5>
   <style>
 
     .homem {
@@ -165,12 +162,14 @@
 
     var legenda = d3.select('#legenda')
             .append('svg')
-            .attr('width', 100)
-            .attr('height', 100)
+            .attr('width', 200)
+            .attr('height', 200)
             .attr('transform', 'translate(0,0)');
 
-    legenda.append('rect').attr('x', 10).attr('y', 0).attr('width', 10).attr('height', 10).attr('class', 'homem');
-    legenda.append('rect').attr('x', 10).attr('y', 15).attr('width', 10).attr('height', 10).attr('class', 'mulher');
+    legenda.append('rect').attr('x', 60).attr('y', 20).attr('width', 20).attr('height', 20).attr('class', 'homem');
+    legenda.append('g').attr('transform', 'translate(90,34)').append('text').text('Homens');
+    legenda.append('rect').attr('x', 60).attr('y', 50).attr('width', 20).attr('height', 20).attr('class', 'mulher');
+    legenda.append('g').attr('transform', 'translate(90,65)').append('text').text('Mulheres');
 
     }
 
