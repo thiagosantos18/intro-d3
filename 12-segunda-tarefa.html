@@ -1,28 +1,24 @@
-<!DOCTYPE html>
+
 <html lang="pt-br">
 
 <head>
   <meta charset="utf-8">
-  <title>Barras simples</title>
+  <title>Primeira Tarefa</title>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 </head>
 
 <body>
-  <div class="container">
-    <div class="row">
-      <h2>Tarefa 01</h2>
-    </div>
-    <div class="row mychart" id="bobs">
+  <div class="row container">
+    <div class="col-md-4 mychart" id="bobs">
     <h3>Bob's</h3>
     </div>
-    <div class="row mychart" id="jackson">
+    <div class="col-md-4 mychart" id="jackson">
     <h3>Jackson do Pandeiro</h3>
     </div>
-    <div class="row mychart" id="burrinhos">
+    <div class="col-md-4 mychart" id="burrinhos">
     <h3>Burrinhos do açude</h3>
     </div>
-    <h5>Não sei porque o dominio do x não está indo até o máximo dos burrinhos</h5>
   </div>
 
   <style>
@@ -59,11 +55,16 @@
                 .range([0, alturaVis])
                 .paddingInner(0.25); // Configure essa escala com domain, range e padding OK
 
-      var max = d3.max(dados_burrinhos, (d, i) => d.total_motorizados);
-
+      // :)
+      var max = 0;
+      for (var i=0; i<dados_burrinhos.length; i++) {
+        if (parseInt(dados_burrinhos[i].total_motorizados) > max) {
+          max = dados_burrinhos[i].total_motorizados;
+        }
+      }
       var x = d3.scaleLinear()
                 .domain([0, max]) // Configure essa escala com domain e range OK
-                .range([0, larguraVis]);        // Lembre que uma escala pode converter de 1..10 -> 100..1 OK
+                .range([0, larguraVis-200]);        // Lembre que uma escala pode converter de 1..10 -> 100..1 OK
 
 
       var grafico_bobs = d3.select('#bobs') // cria elemento <svg> com um <g> dentro
@@ -165,7 +166,7 @@
 
     }
 
-    d3.csv('dados/dados.csv', function(dados) {
+    d3.csv('https://raw.githubusercontent.com/thiagosantos18/intro-d3/master/dados/dados.csv', function(dados) {
       desenhaBarras(dados);
     });
 
