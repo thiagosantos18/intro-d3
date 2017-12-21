@@ -11,14 +11,19 @@
 <body>
   <div class="row container">
     <div class="col-md-4 mychart" id="bobs">
-    <h3>Bob's</h3>
+      <h3><b>Bob's</b></h3>
     </div>
     <div class="col-md-4 mychart" id="jackson">
-    <h3>Jackson do Pandeiro</h3>
+      <h3><b>Jackson do Pandeiro</b></h3>
     </div>
     <div class="col-md-4 mychart" id="burrinhos">
-    <h3>Burrinhos do açude</h3>
+      <h3><b>Burrinhos do açude</b></h3>
     </div>
+
+    <div id="tooltip" class="hidden">
+       <p><b id="value">0</b></p>
+    </div>
+    <h5 style='font-style:italic;'>Passe o mouse nas barras e veja suas quantidades!</h5>
   </div>
 
   <style>
@@ -31,6 +36,26 @@
     .mychart text {
       font: 10px sans-serif;
       text-anchor: left;
+    }
+
+    #tooltip {
+      position: absolute;
+      width: auto;
+      height: auto;
+      padding: 10px;
+      background-color: mediumturquoise;
+      border-radius: 10px;
+    }
+
+    #tooltip.hidden {
+      display: none;
+    }
+
+    #tooltip p {
+      margin: 0;
+      font-family: sans-serif;
+      font-size: 12px;
+      line-height: 20px;
     }
 
   </style>
@@ -99,21 +124,34 @@
             .attr('height', y.bandwidth())
             .attr('width', (d) => x(d.total_motorizados));
 
-        grafico_bobs.selectAll('g')
-          .data(dados_bobs)
-          .enter()
-          .append('text')
-          .attr('x', d => x(d.total_motorizados)).attr('y', d => y(d.horario_inicial)).attr('transform', 'translate(2,8)').text(d => d.total_motorizados);
-
        grafico_bobs.append('g')
                 .attr('transform', 'translate(0,0)')
-                .call(d3.axisLeft(y))  // gera eixo a partir da escala
+                .call(d3.axisLeft(y));
 
        grafico_bobs.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + alturaVis + ")")
-              .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
+              .call(d3.axisBottom(x));
 
+       grafico_bobs.selectAll("rect").on("mouseover", mouseDentro);
+              function mouseDentro(d){
+                d3.select("#tooltip") // reparou que tem uma div escondida no html?
+                  .style("left", (d3.event.pageX) + "px")
+                  .style("top", d3.event.pageY + "px")
+                  .select("#value")
+                  .html('Total: ' + d.total_motorizados + '<br>' + 'Carros: ' + d.carros + '<br>' + 'Motos: ' + d.motos + '<br>'+ 'Ônibus: '+ d.onibus + '<br>' + 'Caminhões: ' + d.caminhoes);
+                // Mostra o tooltip
+                d3.select("#tooltip").classed("hidden", false);
+              }
+
+       grafico_bobs.selectAll("rect").on("mouseout", mouseSaiu);
+              function mouseSaiu(d){
+                d3.selectAll("text")
+                  .style("font-weight", "normal");
+
+                // não precisamos mais de tooltip
+                d3.select("#tooltip").classed("hidden", true);
+        }
 
        grafico_jackson.selectAll('rect')
               .data(dados_jackson)
@@ -124,12 +162,6 @@
               .attr('height', y.bandwidth())
               .attr('width', (d) => x(d.total_motorizados));
 
-      grafico_jackson.selectAll('g')
-                .data(dados_jackson)
-                .enter()
-                .append('text')
-                .attr('x', d => x(d.total_motorizados)).attr('y', d => y(d.horario_inicial)).attr('transform', 'translate(2,8)').text(d => d.total_motorizados);
-
       grafico_jackson.append('g')
                 .attr('transform', 'translate(0,0)')
                 .call(d3.axisLeft(y))  // gera eixo a partir da escala
@@ -138,6 +170,25 @@
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + alturaVis + ")")
                 .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
+
+      grafico_jackson.selectAll("rect").on("mouseover", mouseDentro);
+              function mouseDentro(d){
+                  d3.select("#tooltip") // reparou que tem uma div escondida no html?
+                  .style("left", (d3.event.pageX) + "px")
+                  .style("top", d3.event.pageY + "px")
+                  .select("#value")
+                  .html('Total: ' + d.total_motorizados + '<br>' + 'Carros: ' + d.carros + '<br>' + 'Motos: ' + d.motos + '<br>'+ 'Ônibus: '+ d.onibus + '<br>' + 'Caminhões: ' + d.caminhoes);
+                  // Mostra o tooltip
+                  d3.select("#tooltip").classed("hidden", false);
+                  }
+
+      grafico_jackson.selectAll("rect").on("mouseout", mouseSaiu);
+             function mouseSaiu(d){
+                  d3.selectAll("text")
+                  .style("font-weight", "normal");
+                  // não precisamos mais de tooltip
+                  d3.select("#tooltip").classed("hidden", true);
+              }
 
 
       grafico_burrinhos.selectAll('rect')
@@ -149,12 +200,6 @@
                 .attr('height', y.bandwidth())
                 .attr('width', (d) => x(d.total_motorizados));
 
-      grafico_burrinhos.selectAll('g')
-          .data(dados_burrinhos)
-          .enter()
-          .append('text')
-          .attr('x', d => x(d.total_motorizados)).attr('y', d => y(d.horario_inicial)).attr('transform', 'translate(2,8)').text(d => d.total_motorizados);
-
      grafico_burrinhos.append('g')
          .attr('transform', 'translate(0,0)')
          .call(d3.axisLeft(y))  // gera eixo a partir da escala
@@ -164,6 +209,27 @@
         .attr("transform", "translate(0," + alturaVis + ")")
         .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
 
+
+        grafico_burrinhos.selectAll("rect").on("mouseover", mouseDentro);
+               function mouseDentro(d){
+                 console.log(d);
+                 d3.select("#tooltip") // reparou que tem uma div escondida no html?
+                   .style("left", (d3.event.pageX) + "px")
+                   .style("top", d3.event.pageY + "px")
+                   .select("#value")
+                   .html('Total: ' + d.total_motorizados + '<br>' + 'Carros: ' + d.carros + '<br>' + 'Motos: ' + d.motos + '<br>'+ 'Ônibus: '+ d.onibus + '<br>' + 'Caminhões: ' + d.caminhoes);
+                 // Mostra o tooltip
+                 d3.select("#tooltip").classed("hidden", false);
+               }
+
+        grafico_burrinhos.selectAll("rect").on("mouseout", mouseSaiu);
+               function mouseSaiu(d){
+                 d3.selectAll("text")
+                   .style("font-weight", "normal");
+
+                 // não precisamos mais de tooltip
+                 d3.select("#tooltip").classed("hidden", true);
+         }
     }
 
     d3.csv('https://raw.githubusercontent.com/thiagosantos18/intro-d3/master/dados/dados.csv', function(dados) {
