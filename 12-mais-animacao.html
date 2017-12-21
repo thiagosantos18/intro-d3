@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <title>Exemplo mais completo</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/colorbrewer.v1.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-md-8">
+        <div class="row">
+          <h2>Data wrangling e animação</h2>
+        </div>
+        <div class="row">
+          <p>
+             Um exemplo com mais data wrangling e com animação.
+          </p>
+        </div>
+        <div class="row">
+          <h3>Disciplinas do CCC ao longo do tempo</h3>
+          <br>
+          <p>
+            Cada círculo é uma disciplina. Seu tamanho é seu número de matriculados
+            naquele ano. A cor mostra o departamento que oferece a disciplina.
+          </p>
+          <br>
+          <div class="row mychart" id="chart">
+            <a id="status">Carregando...</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .axis {
+      font-family: "Arial";
+      font-size: 11px;
+      fill: #808080;
+      }
+      .circle {
+        fill-opacity: 0.75;
+        stroke: #c0c0c0;
+      }
+      .domain {
+        stroke: #c0c0c0;
+      }
+      .tick > line {
+        stroke: #c0c0c0;
+      }
+      .year {
+        font-family: "Georgia";
+        font-size: 100px;
+        fill: #d0d0d0;
+      }
+      .mychart text {
+        font: 11px sans-serif;
+        text-anchor: end;
+        color: grey;
+      }
+
+      .tooltip_circulo {
+        font: 8px sans-serif;
+        text-anchor: middle;
+        fill: grey;
+      }
+
+			.tooltip_circulo_hidden {
+				display: none;
+			}
+
+    </style>
+
+    <script src="./12-mais-animacao.js"/>
+  </body>
+</html>
