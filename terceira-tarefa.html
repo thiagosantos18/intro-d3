@@ -3,32 +3,37 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Primeira Tarefa</title>
+  <title>Quarta Tarefa</title>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 </head>
 
 <body>
   <div class="row container">
-    <div class="col-md-4 mychart" id="bobs">
-    <h3 style="text-align:center;"> Bob's</h3>
+    <div class="col-md-10 mychart" id="grafico">
+    <h3>Grafico</h3>
     </div>
-    <div class="col-md-4 mychart" id="jackson">
-    <h3 style="text-align:center;">Jackson do Pandeiro</h3>
-    </div>
-    <div class="col-md-4 mychart" id="burrinhos">
-    <h3 style="text-align:center;">Burrinhos do açude</h3>
+    <div class="col-md-2 mychart" id="legenda">
+    <h3 style="text-align:center;">Legenda</h3>
     </div>
   </div>
-  <h5 style="text-align:center;">Legenda <div class="row" id='legenda'></div></h5>
+
   <style>
-
-    .homem {
-      fill: steelblue;
+    .carros {
+      stroke: steelblue;
+      stroke-width: 3;
     }
-
-    .mulher {
-      fill: red;
+    .motos {
+      stroke: goldenrod;
+      stroke-width: 3;
+    }
+    .onibus {
+      stroke: red;
+      stroke-width: 3;
+    }
+    .caminhoes {
+      stroke: black;
+      stroke-width: 3;
     }
 
     .mychart text {
@@ -41,140 +46,127 @@
   <script type="text/javascript">
     "use strict"
 
-    function desenhaBolas(dados) {
+    function desenhaLinhas(dados) {
 
-      var dados_bobs = dados.filter((d) =>  d.local === "bobs");
-      var dados_jackson = dados.filter((d) =>  d.local === "jackson");
-      var dados_burrinhos = dados.filter((d) =>  d.local === "burrinhos");
+
+      var horario_unitario = dados.filter((d) =>  d.local === "bobs");
 
       // definicoes de altura e largura do svg e da vis dentro
-      var alturaSVG = 400, larguraSVG = 400;
-      var	margin = {top: 10, right: 10, bottom:10, left: 10}, // para descolar a vis das bordas do grafico
+      var alturaSVG = 500, larguraSVG = 1000;
+      var	margin = {top: 10, right: 20, bottom:30, left: 45}, // para descolar a vis das bordas do grafico
           larguraVis = larguraSVG - margin.left - margin.right,
           alturaVis = alturaSVG - margin.top - margin.bottom;
 
+      var x = d3.scaleBand()
+                .domain(horario_unitario.map((d, i) => d.horario_inicial))
+                .range([0, larguraVis])
+                .paddingInner(0.25);
 
-      function totalHomens(array){
-        return array.reduce((a, e) => a + parseInt(e.homens_ciclistas) + parseInt(e.homens_pedestres), 0);
+      function maior(car, moto, bus, truck){
+          return Math.max(Math.max(parseInt(car), parseInt(moto)),Math.max(parseInt(bus), parseInt(truck)));
       }
 
-      function totalMulheres(array){
-        return array.reduce((a, e) => a + parseInt(e.mulheres_ciclistas) + parseInt(e.mulheres_pedestres), 0);
+      function pontoMaximo(){
+        var better = 0;
+        var todosLugares = []
+        var atualMaior = 0;
+
+        for(var i=0; i < horario_unitario.length; i++){
+          todosLugares = dados.filter((d) => d.horario_inicial === horario_unitario[i].horario_inicial);
+          atualMaior = maior(todosLugares.reduce((a, e) => a + parseInt(e.carros), 0), todosLugares.reduce((a, e) => a + parseInt(e.motos), 0), todosLugares.reduce((a, e) => a + parseInt(e.onibus), 0), todosLugares.reduce((a, e) => a + parseInt(e.caminhoes), 0));
+          atualMaior > better? better = atualMaior : 0;
+        }
+        return better;
+
       }
 
+      console.log(pontoMaximo())
 
-      var grafico_bobs = d3.select('#bobs')
+      var y = d3.scaleLinear()
+                .domain([pontoMaximo(), 0])
+                .range([0, alturaVis]);
+
+    var grafico = d3.select('#grafico') // cria elemento <svg> com um <g> dentro
          .append('svg')
          .attr('width', larguraVis + margin.left + margin.right)
          .attr('height', alturaVis + margin.top + margin.bottom)
+         .append('g') // para entender o <g> vá em x03-detalhes-svg.html
          .attr('transform', 'translate(' +  margin.left + ',' + margin.top + ')');
 
 
-      var grafico_jackson = d3.select('#jackson')
-          .append('svg')
-          .attr('width', larguraVis + margin.left + margin.right)
-          .attr('height', alturaVis + margin.top + margin.bottom)
-          .attr('transform', 'translate(' +  margin.left + ',' + margin.top + ')');
+     grafico.selectAll('g')
+         .data(horario_unitario.filter((d, i) => i+1 < horario_unitario.length? d: 0))
+         .enter()
+         .append('line')
+         .attr('x1', d => x(d.horario_inicial))
+         .attr('y1', d => y(dados.filter((k) => k.horario_inicial === d.horario_inicial).reduce((a, e) => a+ parseInt(e.carros), 0)))
+         .attr('x2', (d, i) => i+1 < horario_unitario.length? x(horario_unitario[i+1].horario_inicial): 0)
+         .attr('y2', (d, i) => i+1 < horario_unitario.length? y(dados.filter((k) => k.horario_inicial === horario_unitario[i+1].horario_inicial).reduce((a, e) => a+ parseInt(e.carros), 0)): 0)
+         .attr('class', 'carros');
 
 
-      var grafico_burrinhos = d3.select('#burrinhos') // cria elemento <svg> com um <g> dentro
-            .append('svg')
-            .attr('width', larguraVis + margin.left + margin.right)
-            .attr('height', alturaVis + margin.top + margin.bottom)
-            .attr('transform', 'translate(' +  margin.left + ',' + margin.top + ')');
+     grafico.selectAll('g')
+          .data(horario_unitario.filter((d, i) => i+1 < horario_unitario.length? d: 0))
+          .enter()
+          .append('line')
+          .attr('x1', d => x(d.horario_inicial))
+          .attr('y1', d => y(dados.filter((k) => k.horario_inicial === d.horario_inicial).reduce((a, e) => a+ parseInt(e.motos), 0)))
+          .attr('x2', (d, i) => i+1 < horario_unitario.length? x(horario_unitario[i+1].horario_inicial): 0)
+          .attr('y2', (d, i) => i+1 < horario_unitario.length? y(dados.filter((k) => k.horario_inicial === horario_unitario[i+1].horario_inicial).reduce((a, e) => a+ parseInt(e.motos), 0)): 0)
+          .attr('class', 'motos');
 
 
-      var homens_bobs = totalHomens(dados_bobs);
-      var mulheres_bobs = totalMulheres(dados_bobs);
-      var total_bobs = homens_bobs + mulheres_bobs;
-      var maior_bobs = homens_bobs >= mulheres_bobs? homens_bobs: mulheres_bobs;
-
-      var ybo = d3.scaleLinear()
-                .domain([0, maior_bobs])
-                .range([0, (larguraVis/2) * (maior_bobs/total_bobs)]);
-
-      grafico_bobs.append('circle')
-            .attr('cx', larguraVis/2)
-            .attr('cy', alturaVis/2)
-            .attr('r', (larguraVis/2) * (homens_bobs/total_bobs)).attr('class', 'homem');
-
-       grafico_bobs.append('circle')
-                .attr('cx', larguraVis/2)
-                .attr('cy', alturaVis/2)
-                .attr('r', (larguraVis/2) * (mulheres_bobs/total_bobs)).attr('class', 'mulher');
-
-      grafico_bobs.append("g")
-                .attr("class", "y axis")
-                .attr("transform", "translate(" + larguraVis/2 + ',' + alturaVis/2 +')')
-                .call(d3.axisLeft(ybo));
+      grafico.selectAll('g')
+          .data(horario_unitario.filter((d, i) => i+1 < horario_unitario.length? d: 0))
+          .enter()
+          .append('line')
+          .attr('x1', d => x(d.horario_inicial))
+          .attr('y1', d => y(dados.filter((k) => k.horario_inicial === d.horario_inicial).reduce((a, e) => a+ parseInt(e.onibus), 0)))
+          .attr('x2', (d, i) => i+1 < horario_unitario.length? x(horario_unitario[i+1].horario_inicial): 0)
+          .attr('y2', (d, i) => i+1 < horario_unitario.length? y(dados.filter((k) => k.horario_inicial === horario_unitario[i+1].horario_inicial).reduce((a, e) => a+ parseInt(e.onibus), 0)): 0)
+          .attr('class', 'onibus');
 
 
-      var homens_jackson = totalHomens(dados_jackson);
-      var mulheres_jackson = totalMulheres(dados_jackson);
-      var total_jackson = homens_jackson + mulheres_jackson;
+      grafico.selectAll('g')
+          .data(horario_unitario.filter((d, i) => i+1 < horario_unitario.length? d: 0))
+          .enter()
+          .append('line')
+          .attr('x1', d => x(d.horario_inicial))
+          .attr('y1', d => y(dados.filter((k) => k.horario_inicial === d.horario_inicial).reduce((a, e) => a+ parseInt(e.caminhoes), 0)))
+          .attr('x2', (d, i) => i+1 < horario_unitario.length? x(horario_unitario[i+1].horario_inicial): 0)
+          .attr('y2', (d, i) => i+1 < horario_unitario.length? y(dados.filter((k) => k.horario_inicial === horario_unitario[i+1].horario_inicial).reduce((a, e) => a+ parseInt(e.caminhoes), 0)): 0)
+          .attr('class', 'caminhoes');
 
-      var maior_jackson = homens_jackson >= mulheres_jackson? homens_jackson: mulheres_jackson;
-      var yja = d3.scaleLinear()
-                .domain([0, maior_jackson])
-                .range([0, (larguraVis/2) * (maior_jackson/total_jackson)]);
+      grafico.append('g')
+      .attr('transform', 'translate(0,0)')
+      .call(d3.axisLeft(y));
 
-      grafico_jackson.append('circle')
-                  .attr('cx', larguraVis/2)
-                  .attr('cy', alturaVis/2)
-                  .attr('r', (larguraVis/2) * (homens_jackson/total_jackson)).attr('class', 'homem');
+      grafico.append("g")
+         .attr("class", "x axis")
+         .attr("transform", "translate(0," + alturaVis + ")" )
+         .call(d3.axisBottom(x).tickValues(horario_unitario.map((d, i) => d.horario_inicial).reduce((a , e, i) => { if(i%2 === 0){ return a.concat(e);} return a;}, [])));
 
-      grafico_jackson.append('circle')
-                  .attr('cx', larguraVis/2)
-                  .attr('cy', alturaVis/2)
-                  .attr('r', (larguraVis/2) * (mulheres_jackson/total_jackson)).attr('class', 'mulher');
+         var legenda = d3.select('#legenda')
+                 .append('svg')
+                 .attr('width', 200)
+                 .attr('height', 200)
+                 .attr('transform', 'translate(0,0)');
 
-      grafico_jackson.append("g")
-                  .attr("class", "y axis")
-                  .attr("transform", "translate(" + larguraVis/2 + ',' + alturaVis/2 +')')
-                  .call(d3.axisLeft(yja));
-
-     var homens_burrinhos = totalHomens(dados_burrinhos);
-     var mulheres_burrinhos = totalMulheres(dados_burrinhos);
-     var total_burrinhos = homens_burrinhos + mulheres_burrinhos;
-
-     var maior_burrinhos = homens_burrinhos >= mulheres_burrinhos? homens_burrinhos: mulheres_burrinhos;
-     var ybu = d3.scaleLinear()
-               .domain([0, maior_burrinhos])
-               .range([0, (larguraVis/2) * (maior_burrinhos/total_burrinhos)]);
-
-
-     grafico_burrinhos.append('circle')
-                 .attr('cx', larguraVis/2)
-                 .attr('cy', alturaVis/2)
-                 .attr('r', (larguraVis/2) * (homens_burrinhos/total_burrinhos)).attr('class', 'homem');
-
-     grafico_burrinhos.append('circle')
-                 .attr('cx', larguraVis/2)
-                 .attr('cy', alturaVis/2)
-                 .attr('r', (larguraVis/2) * (mulheres_burrinhos/total_burrinhos)).attr('class', 'mulher');
-
-     grafico_burrinhos.append("g")
-                 .attr("class", "y axis")
-                 .attr("transform", "translate(" + larguraVis/2 + ',' + alturaVis/2 +')')
-                 .call(d3.axisLeft(ybu));
+         legenda.append('line').attr('x1', 50).attr('y1', 30).attr('x2', 80).attr('y2', 30).attr('class', 'carros');
+         legenda.append('g').attr('transform', 'translate(90,34)').append('text').text('Carros');
+         legenda.append('line').attr('x1', 50).attr('y1', 60).attr('x2', 80).attr('y2', 60).attr('class', 'motos');
+         legenda.append('g').attr('transform', 'translate(90,65)').append('text').text('Motos');
+         legenda.append('line').attr('x1', 50).attr('y1', 90).attr('x2', 80).attr('y2', 90).attr('class', 'onibus');
+         legenda.append('g').attr('transform', 'translate(90,96)').append('text').text('Ônibus');
+         legenda.append('line').attr('x1', 50).attr('y1', 120).attr('x2', 80).attr('y2', 120).attr('class', 'caminhoes');
+         legenda.append('g').attr('transform', 'translate(90,125)').append('text').text('Caminhões');
 
 
-
-    var legenda = d3.select('#legenda')
-            .append('svg')
-            .attr('width', 200)
-            .attr('height', 200)
-            .attr('transform', 'translate(0,0)');
-
-    legenda.append('rect').attr('x', 60).attr('y', 20).attr('width', 20).attr('height', 20).attr('class', 'homem');
-    legenda.append('g').attr('transform', 'translate(90,34)').append('text').text('Homens');
-    legenda.append('rect').attr('x', 60).attr('y', 50).attr('width', 20).attr('height', 20).attr('class', 'mulher');
-    legenda.append('g').attr('transform', 'translate(90,65)').append('text').text('Mulheres');
 
     }
 
     d3.csv('https://raw.githubusercontent.com/thiagosantos18/intro-d3/master/dados/dados.csv', function(dados) {
-      desenhaBolas(dados);
+      desenhaLinhas(dados);
     });
 
   </script>
